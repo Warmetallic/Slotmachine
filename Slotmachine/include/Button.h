@@ -14,7 +14,7 @@ public:
     void handleEvent(const SDL_Event& e);
     bool isClicked() const;
     void resetClick();
-    void setActive(bool active); // New method to set the button active/inactive
+    void setActive(bool active); // method to set the button active/inactive
 
 private:
     SDL_Renderer* mRenderer;
@@ -22,7 +22,7 @@ private:
     std::string mText;
     bool mHighlighted;
     bool mClicked;
-    bool mActive; // New variable to track active state
+    bool mActive; //  variable to track active state
     Uint32 mAnimationStartTime;
     const Uint32 mAnimationDuration = 500; // Duration in milliseconds
 
@@ -34,9 +34,9 @@ private:
     void renderText(const std::string& text, int x, int y);
     void animate();
     void setColor(const SDL_Color& color);
-    void playClickSound(); // Add this method to play sound
+    void playClickSound(); // method to play sound
 
-    Mix_Chunk* mClickSound; // Add this for sound effect
+    Mix_Chunk* mClickSound; // for sound effect
 };
 
 #endif

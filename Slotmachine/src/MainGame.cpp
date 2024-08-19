@@ -1,20 +1,31 @@
 ﻿#include "MainGame.h"
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <SDL_mixer.h> // Ensure SDL_mixer is included
-#include <stdio.h>
-#include <ctime> // For std::time()
+#include <SDL_mixer.h> 
+#include <ctime> 
 
+/**
+ * MainGame class constructor.
+ * Initializes member variables and seeds the random number generator.
+ */
 MainGame::MainGame()
     : gWindow(NULL), gRenderer(NULL), background(NULL), frame(NULL), button(NULL), fpsMeter(NULL),
     backgroundMusic(NULL), lastTime(0), currentTime(0), deltaTime(0), areReelsSpinning(false) {
     std::srand(static_cast<unsigned>(std::time(0))); // Initialize random seed
 }
 
+/**
+ * MainGame class destructor.
+ * Calls the close method to clean up resources.
+ */
 MainGame::~MainGame() {
     close();
 }
 
+/**
+ * Initializes SDL, creates the window and renderer, and initializes SDL_ttf and SDL_mixer.
+ * @return True if initialization is successful, false otherwise.
+ */
 bool MainGame::init() {
     bool success = true;
 
@@ -55,6 +66,10 @@ bool MainGame::init() {
     return success;
 }
 
+/**
+ * Loads media assets such as textures, fonts, and sounds.
+ * @return True if all media assets are loaded successfully, false otherwise.
+ */
 bool MainGame::loadMedia() {
     background = new Background(gRenderer);
     if (!background->loadMedia("assets/textures/background.jpeg")) {
@@ -116,6 +131,10 @@ bool MainGame::loadMedia() {
     return true;
 }
 
+/**
+ * Handles user input events such as quitting the game or pressing keys.
+ * @param quit Reference to a boolean that indicates whether the game should quit.
+ */
 void MainGame::handleEvents(bool& quit) {
     SDL_Event e;
     while (SDL_PollEvent(&e) != 0) {
@@ -144,6 +163,9 @@ void MainGame::handleEvents(bool& quit) {
     }
 }
 
+/**
+ * Renders the game objects to the screen.
+ */
 void MainGame::render() {
     SDL_RenderClear(gRenderer);
 
@@ -161,6 +183,9 @@ void MainGame::render() {
     SDL_RenderPresent(gRenderer);
 }
 
+/**
+ * Main game loop that handles events, updates game state, and renders the game.
+ */
 void MainGame::run() {
     bool quit = false;
 
@@ -193,6 +218,9 @@ void MainGame::run() {
     }
 }
 
+/**
+ * Cleans up resources and quits SDL subsystems.
+ */
 void MainGame::close() {
     for (auto reel : mReels) {
         delete reel;

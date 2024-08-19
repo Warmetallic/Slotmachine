@@ -3,6 +3,12 @@
 #include <iostream>
 #include <Constants.h>
 
+/**
+ * Constructor for the Frame class.
+ * Initializes the frame with the given renderer and border width.
+ * @param renderer The SDL_Renderer to use for rendering.
+ * @param borderWidth The width of the border.
+ */
 Frame::Frame(SDL_Renderer* renderer, int borderWidth)
     : mRenderer(renderer), mBorderWidth(borderWidth), mBottomHeight(198), mBottomTexture(nullptr), mHeaderTexture(nullptr) {
     mRect.x = 0;
@@ -11,8 +17,12 @@ Frame::Frame(SDL_Renderer* renderer, int borderWidth)
     mRect.h = 100; // Default height
 }
 
+/**
+ * Destructor for the Frame class.
+ * Cleans up the loaded textures.
+ */
 Frame::~Frame() {
-    // Clean up the texture
+    // Clean up the bottom texture
     if (mBottomTexture != nullptr) {
         SDL_DestroyTexture(mBottomTexture);
         mBottomTexture = nullptr;
@@ -25,6 +35,11 @@ Frame::~Frame() {
     }
 }
 
+/**
+ * Sets the dimensions of the frame.
+ * @param width The new width of the frame.
+ * @param height The new height of the frame.
+ */
 void Frame::setDimensions(int width, int height) {
     mRect.w = width;
     mRect.h = height;
@@ -32,6 +47,11 @@ void Frame::setDimensions(int width, int height) {
     mRect.y = (SCREEN_HEIGHT - mRect.h - 100) / 2; // Adjust y position if needed
 }
 
+/**
+ * Loads the bottom texture from the given file path.
+ * @param path The file path to the texture.
+ * @return True if the texture was loaded successfully, false otherwise.
+ */
 bool Frame::loadBottomTexture(const std::string& path) {
     // Clean up any existing texture
     if (mBottomTexture != nullptr) {
@@ -58,7 +78,11 @@ bool Frame::loadBottomTexture(const std::string& path) {
     return mBottomTexture != nullptr;
 }
 
-
+/**
+ * Loads the header texture from the given file path.
+ * @param path The file path to the texture.
+ * @return True if the texture was loaded successfully, false otherwise.
+ */
 bool Frame::loadHeaderTexture(const std::string& path) {
     // Clean up any existing texture
     if (mHeaderTexture != nullptr) {
@@ -85,6 +109,9 @@ bool Frame::loadHeaderTexture(const std::string& path) {
     return mHeaderTexture != nullptr;
 }
 
+/**
+ * Renders the frame, including its border, lines, bottom, and header.
+ */
 void Frame::render() {
     drawBorder();
     drawLines();
@@ -92,8 +119,10 @@ void Frame::render() {
     drawHeader();
 }
 
+/**
+ * Draws the border of the frame.
+ */
 void Frame::drawBorder() {
-
     // Set the color for the metallic gray border
     SDL_SetRenderDrawColor(mRenderer, 75, 75, 68, 255); // Metallic gray color
 
@@ -104,7 +133,7 @@ void Frame::drawBorder() {
     // Calculate the border rectangle dimensions
     SDL_Rect borderRect = {
         mRect.x - sideExtension,            // Move left edge to the left
-        mRect.y - sideExtension * 4,                            // Top edge stays the same
+        mRect.y - sideExtension * 4,        // Top edge stays the same
         mRect.w + 2 * sideExtension,        // Width increased by twice the side extension
         mRect.h + borderThickness           // Height includes bottom border
     };
@@ -117,8 +146,9 @@ void Frame::drawBorder() {
     SDL_RenderFillRect(mRenderer, &mRect);
 }
 
-
-
+/**
+ * Draws the header of the frame.
+ */
 void Frame::drawHeader() {
     // Increase width and height slightly to make it larger than the frame
     int extraWidth = 10;
@@ -128,7 +158,7 @@ void Frame::drawHeader() {
     int newX = mRect.x - (extraWidth / 2);
     int newY = mRect.y - mBottomHeight - extraHeight; // Adjust y to be slightly above the frame
 
-    SDL_Rect headerRect = { newX, newY+150, mRect.w + extraWidth, 50 };
+    SDL_Rect headerRect = { newX, newY + 150, mRect.w + extraWidth, 50 };
 
     if (mHeaderTexture != nullptr) {
         // Draw the texture in the header section
@@ -145,8 +175,9 @@ void Frame::drawHeader() {
     }
 }
 
-
-
+/**
+ * Draws the bottom of the frame.
+ */
 void Frame::drawBottom() {
     // Increase width and height slightly to make it larger than the frame
     int extraWidth = 12;
@@ -173,6 +204,9 @@ void Frame::drawBottom() {
     }
 }
 
+/**
+ * Draws the vertical lines within the frame.
+ */
 void Frame::drawLines() {
     int borderOffset = 1; // Adjust as needed to avoid overlap
     int numParts = 5;
@@ -186,22 +220,43 @@ void Frame::drawLines() {
 }
 
 // Getter methods
+
+/**
+ * Gets the width of the frame.
+ * @return The width of the frame.
+ */
 int Frame::getWidth() const {
     return mRect.w;
 }
 
+/**
+ * Gets the height of the frame.
+ * @return The height of the frame.
+ */
 int Frame::getHeight() const {
     return mRect.h;
 }
 
+/**
+ * Gets the x-coordinate of the frame.
+ * @return The x-coordinate of the frame.
+ */
 int Frame::getX() const {
     return mRect.x;
 }
 
+/**
+ * Gets the y-coordinate of the frame.
+ * @return The y-coordinate of the frame.
+ */
 int Frame::getY() const {
     return mRect.y;
 }
 
+/**
+ * Gets the height of the bottom section of the frame.
+ * @return The height of the bottom section of the frame.
+ */
 int Frame::getBottomHeight() const {
     return mBottomHeight;
 }

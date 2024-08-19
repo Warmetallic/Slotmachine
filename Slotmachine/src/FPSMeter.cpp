@@ -3,10 +3,20 @@
 #include <stdio.h>
 #include <sstream>
 
+/**
+ * Constructor for the FPSMeter class.
+ * Initializes the FPS meter with the given renderer and font.
+ * @param renderer The SDL_Renderer to use for rendering.
+ * @param font The TTF_Font to use for rendering text.
+ */
 FPSMeter::FPSMeter(SDL_Renderer* renderer, TTF_Font* font)
     : gRenderer(renderer), gFont(font), frameCount(0), startTime(0), fpsTexture(renderer) {
 }
 
+/**
+ * Destructor for the FPSMeter class.
+ * Cleans up the font resource.
+ */
 FPSMeter::~FPSMeter() {
     if (gFont != nullptr) {
         TTF_CloseFont(gFont);
@@ -14,11 +24,18 @@ FPSMeter::~FPSMeter() {
     }
 }
 
+/**
+ * Starts the FPS meter by initializing the start time and frame count.
+ */
 void FPSMeter::start() {
     startTime = SDL_GetTicks();
     frameCount = 0;
 }
 
+/**
+ * Updates the FPS meter by incrementing the frame count and calculating the FPS.
+ * If one second has passed, it updates the FPS texture with the new FPS value.
+ */
 void FPSMeter::update() {
     frameCount++;
     Uint32 currentTime = SDL_GetTicks();
@@ -38,6 +55,11 @@ void FPSMeter::update() {
     }
 }
 
+/**
+ * Renders the FPS texture at the specified position.
+ * @param x The x-coordinate where the FPS texture should be rendered.
+ * @param y The y-coordinate where the FPS texture should be rendered.
+ */
 void FPSMeter::render(int x, int y) {
     fpsTexture.render(x, y);
 }

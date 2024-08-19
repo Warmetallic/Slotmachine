@@ -5,6 +5,16 @@
 #include <cstdlib> // For std::rand()
 #include <ctime>   // For std::time()
 
+/**
+ * Constructor for the Reel class.
+ * Initializes the reel with the given parameters and loads the icons.
+ * @param renderer The SDL_Renderer to use for rendering.
+ * @param x The x-coordinate of the reel.
+ * @param y The y-coordinate of the reel.
+ * @param w The width of the reel.
+ * @param h The height of the reel.
+ * @param iconPaths A vector of file paths to the icons.
+ */
 Reel::Reel(SDL_Renderer* renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths)
     : mRenderer(renderer), mReelRect{ x, y, w, h }, mCurrentIconIndex(0), mSpinning(false), mSpinDuration(2000),
     mStartPosition(0), mSpinSpeed(1.0f), mMaxPosition(1000), mStartPositionOffset(0), mStopDelay(0) {
@@ -15,12 +25,20 @@ Reel::Reel(SDL_Renderer* renderer, int x, int y, int w, int h, const std::vector
     mClipRect = { x, y, w, h }; // Initialize the clip rectangle
 }
 
+/**
+ * Destructor for the Reel class.
+ * Cleans up the loaded textures.
+ */
 Reel::~Reel() {
     for (auto texture : mIcons) {
         SDL_DestroyTexture(texture);
     }
 }
 
+/**
+ * Loads the icons from the given file paths.
+ * @param iconPaths A vector of file paths to the icons.
+ */
 void Reel::loadIcons(const std::vector<std::string>& iconPaths) {
     for (const auto& path : iconPaths) {
         SDL_Surface* loadedSurface = IMG_Load(path.c_str());
@@ -40,10 +58,18 @@ void Reel::loadIcons(const std::vector<std::string>& iconPaths) {
     }
 }
 
+/**
+ * Sets the clipping rectangle for the reel.
+ * @param clipRect The SDL_Rect defining the clipping rectangle.
+ */
 void Reel::setClipRect(const SDL_Rect& clipRect) {
     mClipRect = clipRect;
 }
 
+/**
+ * Renders the reel, updating its position if it is spinning.
+ * @param deltaTime The time elapsed since the last frame.
+ */
 void Reel::render(Uint32 deltaTime) {
     if (mSpinning) {
         update(deltaTime); // Update the position of the reel
@@ -70,6 +96,12 @@ void Reel::render(Uint32 deltaTime) {
     SDL_RenderSetClipRect(mRenderer, NULL); // Reset the clipping rectangle
 }
 
+/**
+ * Renders a single icon at the specified position.
+ * @param index The index of the icon to render.
+ * @param yOffset The y-offset for rendering the icon.
+ * @param iconHeight The height of the icon.
+ */
 void Reel::renderIcon(int index, int yOffset, int iconHeight) {
     int borderOffset = 22; // Border width
     int drawableWidth = mReelRect.w - 2 * borderOffset; // Drawable width within the border
@@ -104,21 +136,10 @@ void Reel::renderIcon(int index, int yOffset, int iconHeight) {
     SDL_RenderCopy(mRenderer, mIcons[index], NULL, &renderQuad);
 }
 
-//void Reel::update(Uint32 deltaTime) {
-//    if (mSpinning) {
-//        Uint32 currentTime = SDL_GetTicks();
-//        Uint32 elapsed = currentTime - mSpinStartTime;
-//
-//        if (elapsed < mSpinDuration) {
-//            mStartPosition = (mStartPosition + static_cast<int>(deltaTime * mSpinSpeed)) % mReelRect.h;
-//        }
-//        else if (currentTime >= mStopTime) {
-//            mSpinning = false;
-//            setRandomPosition(); // Set a random position after stopping
-//            printf("Reel stopped at position %d\n", mStartPosition); // Debug statement
-//        }
-//    }
-//}
+/**
+ * Updates the position of the reel if it is spinning.
+ * @param deltaTime The time elapsed since the last frame.
+ */
 void Reel::update(Uint32 deltaTime) {
     if (mSpinning) {
         Uint32 currentTime = SDL_GetTicks();
@@ -138,7 +159,9 @@ void Reel::update(Uint32 deltaTime) {
     }
 }
 
-
+/**
+ * Sets a random position for the reel.
+ */
 void Reel::setRandomPosition() {
     if (mIcons.empty()) return;
     int iconCount = static_cast<int>(mIcons.size());
@@ -147,6 +170,10 @@ void Reel::setRandomPosition() {
     mStartPosition = randomIndex * iconHeight;
 }
 
+/**
+ * Sets the position of the reel.
+ * @param position The new position of the reel.
+ */
 void Reel::setPosition(int position) {
     int totalHeight = mReelRect.h;
 
@@ -159,6 +186,11 @@ void Reel::setPosition(int position) {
     printf("Setting reel position to: %d\n", mStartPosition);
 }
 
+/**
+ * Starts spinning the reel with a random speed and specified stop delay.
+ * @param startOffset The initial offset for the start position.
+ * @param stopDelay The delay before the reel stops.
+ */
 void Reel::startSpin(int startOffset, Uint32 stopDelay) {
     setRandomSpinSpeed();
     mSpinning = true;
@@ -168,24 +200,42 @@ void Reel::startSpin(int startOffset, Uint32 stopDelay) {
     mStopTime = mSpinStartTime + mSpinDuration + stopDelay; // Calculate stop time
 }
 
+/**
+ * Sets the stop time for the reel.
+ * @param time The time at which the reel should stop.
+ */
 void Reel::setStopTime(Uint32 time) {
     mStopTime = time;
 }
 
+/**
+ * Checks if the reel should stop spinning.
+ * @param currentTime The current time.
+ * @return True if the reel should stop, false otherwise.
+ */
 bool Reel::shouldStop(Uint32 currentTime) {
     return currentTime >= mStopTime;
 }
 
-
+/**
+ * Stops the reel from spinning and sets a random position.
+ */
 void Reel::stopSpin() {
     mSpinning = false;
     setRandomPosition();
 }
 
+/**
+ * Checks if the reel is currently spinning.
+ * @return True if the reel is spinning, false otherwise.
+ */
 bool Reel::isSpinning() const {
     return mSpinning;
 }
 
+/**
+ * Sets a random spin speed for the reel.
+ */
 void Reel::setRandomSpinSpeed() {
     // Set a random spin speed between 0.5 and 2.0
     mSpinSpeed = 0.5f + static_cast<float>(std::rand()) / (static_cast<float>(RAND_MAX / (0.5f - 0.1f)));

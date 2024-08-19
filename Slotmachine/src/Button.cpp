@@ -3,6 +3,16 @@
 #include <stdio.h>
 #include <iostream>
 
+/**
+ * Constructor for the Button class.
+ * Initializes the button with the given renderer, position, size, and text.
+ * @param renderer The SDL_Renderer to use for rendering.
+ * @param x The x-coordinate of the button.
+ * @param y The y-coordinate of the button.
+ * @param w The width of the button.
+ * @param h The height of the button.
+ * @param text The text to display on the button.
+ */
 Button::Button(SDL_Renderer* renderer, int x, int y, int w, int h, const std::string& text)
     : mRenderer(renderer), mButtonRect{ x, y, w, h }, mText(text), mHighlighted(false),
     mAnimationStartTime(SDL_GetTicks()), mClicked(false), mActive(true), mClickSound(NULL)
@@ -20,6 +30,10 @@ Button::Button(SDL_Renderer* renderer, int x, int y, int w, int h, const std::st
     }
 }
 
+/**
+ * Destructor for the Button class.
+ * Cleans up the loaded sound effect.
+ */
 Button::~Button() {
     // Free sound effect
     if (mClickSound != NULL) {
@@ -28,6 +42,10 @@ Button::~Button() {
     }
 }
 
+/**
+ * Renders the button, including its text.
+ * Animates the button if it is active.
+ */
 void Button::render() {
     // Animate the button to change color
     if (mActive) {
@@ -45,10 +63,20 @@ void Button::render() {
     renderText(mText, mButtonRect.x + 10, mButtonRect.y + 10);
 }
 
+/**
+ * Sets the color of the button.
+ * @param color The new color of the button.
+ */
 void Button::setColor(const SDL_Color& color) {
     mCurrentColor = color;
 }
 
+/**
+ * Renders the text on the button.
+ * @param text The text to render.
+ * @param x The x-coordinate where the text should be rendered.
+ * @param y The y-coordinate where the text should be rendered.
+ */
 void Button::renderText(const std::string& text, int x, int y) {
     // Load font
     TTF_Font* font = TTF_OpenFont("assets/fonts/FalloutFont.ttf", 26); // Replace with your font and size
@@ -97,6 +125,9 @@ void Button::renderText(const std::string& text, int x, int y) {
     TTF_CloseFont(font);
 }
 
+/**
+ * Animates the button by changing its color periodically.
+ */
 void Button::animate() {
     Uint32 currentTime = SDL_GetTicks();
     Uint32 elapsedTime = currentTime - mAnimationStartTime;
@@ -113,6 +144,10 @@ void Button::animate() {
     }
 }
 
+/**
+ * Handles SDL events for the button, such as mouse clicks.
+ * @param e The SDL_Event to handle.
+ */
 void Button::handleEvent(const SDL_Event& e) {
     if (e.type == SDL_MOUSEBUTTONDOWN && mActive) {
         int mouseX, mouseY;
@@ -130,14 +165,25 @@ void Button::handleEvent(const SDL_Event& e) {
     }
 }
 
+/**
+ * Checks if the button has been clicked.
+ * @return True if the button has been clicked, false otherwise.
+ */
 bool Button::isClicked() const {
     return mClicked;
 }
 
+/**
+ * Resets the clicked state of the button.
+ */
 void Button::resetClick() {
     mClicked = false;
 }
 
+/**
+ * Sets the active state of the button.
+ * @param active The new active state of the button.
+ */
 void Button::setActive(bool active) {
     mActive = active;
     if (active) {
@@ -145,6 +191,9 @@ void Button::setActive(bool active) {
     }
 }
 
+/**
+ * Plays the click sound effect.
+ */
 void Button::playClickSound() {
     if (mClickSound != NULL) {
         if (Mix_PlayChannel(-1, mClickSound, 0) == -1) {

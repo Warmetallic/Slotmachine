@@ -2,9 +2,18 @@
 #include <SDL_image.h>
 #include <stdio.h>
 
+/**
+ * Constructor for the Background class.
+ * Initializes the background with the given renderer.
+ * @param renderer The SDL_Renderer to use for rendering.
+ */
 Background::Background(SDL_Renderer* renderer)
     : mRenderer(renderer), mTexture(NULL) {}
 
+/**
+ * Destructor for the Background class.
+ * Cleans up the loaded texture.
+ */
 Background::~Background() {
     if (mTexture != NULL) {
         SDL_DestroyTexture(mTexture);
@@ -12,6 +21,11 @@ Background::~Background() {
     }
 }
 
+/**
+ * Loads the background texture from the given file path.
+ * @param path The file path to the texture.
+ * @return True if the texture was loaded successfully, false otherwise.
+ */
 bool Background::loadMedia(const std::string& path) {
     SDL_Surface* loadedSurface = IMG_Load(path.c_str());
     if (loadedSurface == NULL) {
@@ -30,6 +44,9 @@ bool Background::loadMedia(const std::string& path) {
     return true;
 }
 
+/**
+ * Renders the background texture to the screen.
+ */
 void Background::render() {
     SDL_RenderCopy(mRenderer, mTexture, NULL, NULL);
 }

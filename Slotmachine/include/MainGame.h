@@ -8,8 +8,8 @@
 #include "Constants.h"
 #include "Reel.h"
 #include <vector>
-#include "FPSMeter.h" // Include the FPSMeter header
-#include <SDL_mixer.h> // Include for SDL_mixer
+#include "FPSMeter.h"
+#include <SDL_mixer.h> 
 
 
 class Background;
@@ -28,7 +28,7 @@ public:
     void render();
     void run();
     void close();
-	bool areReelsSpinning; // Add flag to track if reels are spinning
+	bool areReelsSpinning; 
 
 private:
     SDL_Window* gWindow;
@@ -37,7 +37,7 @@ private:
     Frame* frame;
     Button* button;
     std::vector<Reel*> mReels;
-    FPSMeter* fpsMeter; // Add FPSMeter pointer
+    FPSMeter* fpsMeter; 
 
     // Time management
     Uint32 lastTime;
@@ -45,9 +45,9 @@ private:
     Uint32 deltaTime;
     
 
-    // New method to check if all reels have stopped spinning
+ 
     bool allReelsStopped() const;
-    Mix_Music* backgroundMusic; // Add this line
+    Mix_Music* backgroundMusic;
 };
 
 #endif // MAINGAME_H
