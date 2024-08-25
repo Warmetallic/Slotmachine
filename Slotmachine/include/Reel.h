@@ -5,10 +5,11 @@
 #include <vector>
 #include <string>
 #include "Renderer.h"
+#include <memory>
 
 class Reel {
 public:
-    Reel(Renderer* renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths);
+    Reel(std::shared_ptr<Renderer> renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths);
     ~Reel();
 
     void loadIcons(const std::vector<std::string>& iconPaths);
@@ -28,7 +29,7 @@ public:
 private:
     void setRandomPosition();
 
-    Renderer* mRenderer;
+    std::shared_ptr<Renderer> mRenderer;
     SDL_Rect mReelRect;
     SDL_Rect mClipRect;
     std::vector<SDL_Texture*> mIcons;

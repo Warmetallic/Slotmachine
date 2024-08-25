@@ -3,11 +3,13 @@
 
 #include <string>
 #include "Renderer.h"  // Include the custom Renderer class
+#include <memory>
+
 
 class Frame {
 public:
     // Constructor and Destructor
-    Frame(Renderer* renderer, int borderWidth = 1);  // Use custom Renderer class
+    Frame(std::shared_ptr<Renderer> renderer, int borderWidth = 1);  // Use custom Renderer class
     ~Frame();
 
     // Set the dimensions of the frame
@@ -39,7 +41,7 @@ private:
     void drawBottom();
     void drawHeader();
 
-    Renderer* mRenderer;      // Pointer to the custom Renderer class
+    std::shared_ptr<Renderer> mRenderer;      // Pointer to the custom Renderer class
     SDL_Rect mRect;           // Rectangle defining the main frame
     int mBorderWidth;         // Border width of the frame
     int mBottomHeight;        // Height of the bottom section

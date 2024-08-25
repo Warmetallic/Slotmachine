@@ -1,13 +1,14 @@
 #include "Background.h"
 #include <SDL_image.h>
 #include <stdio.h>
+#include <memory>
 
 /**
  * Constructor for the Background class.
  * Initializes the background with the given renderer.
  * @param renderer The SDL_Renderer to use for rendering.
  */
-Background::Background(Renderer* renderer)
+Background::Background(std::shared_ptr<Renderer> renderer)
     : mRenderer(renderer), mTexture(NULL) {}
 
 /**

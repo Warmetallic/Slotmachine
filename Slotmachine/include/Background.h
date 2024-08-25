@@ -4,16 +4,18 @@
 
 #include <string>
 #include <Renderer.h>
+#include <memory>
+
 
 class Background {
 public:
-    Background(Renderer* renderer);
+    Background(std::shared_ptr<Renderer> renderer);
     ~Background();
     bool loadMedia(const std::string& path);
     void render();
 
 private:
-    Renderer* mRenderer;
+    std::shared_ptr<Renderer> mRenderer;
     SDL_Texture* mTexture;
 };
 

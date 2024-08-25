@@ -5,10 +5,12 @@
 #include <string>
 #include <SDL_mixer.h>
 #include "Renderer.h"
+#include <memory>
+
 
 class Button {
 public:
-    Button(Renderer* renderer, int x, int y, int w, int h, const std::string& text);
+    Button(std::shared_ptr<Renderer> renderer, int x, int y, int w, int h, const std::string& text);
     ~Button();
 
     void render();
@@ -18,12 +20,12 @@ public:
     void setActive(bool active); // method to set the button active/inactive
 
 private:
-    Renderer* mRenderer;  // Reference to the custom Renderer class
+    std::shared_ptr<Renderer> mRenderer;  // Changed to std::shared_ptr
     SDL_Rect mButtonRect;
     std::string mText;
     bool mHighlighted;
     bool mClicked;
-    bool mActive; //  variable to track active state
+    bool mActive; // variable to track active state
     Uint32 mAnimationStartTime;
     const Uint32 mAnimationDuration = 500; // Duration in milliseconds
 

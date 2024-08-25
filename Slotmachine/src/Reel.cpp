@@ -15,7 +15,7 @@
  * @param h The height of the reel.
  * @param iconPaths A vector of file paths to the icons.
  */
-Reel::Reel(Renderer* renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths)
+Reel::Reel(std::shared_ptr<Renderer> renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths)
     : mRenderer(renderer), mReelRect{ x, y, w, h }, mCurrentIconIndex(0), mSpinning(false), mSpinDuration(2000),
     mStartPosition(0), mSpinSpeed(1.0f), mMaxPosition(1000), mStartPositionOffset(0), mStopDelay(0) {
     loadIcons(iconPaths);

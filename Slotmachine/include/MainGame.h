@@ -11,6 +11,7 @@
 #include "FPSMeter.h"
 #include <SDL_mixer.h> 
 #include "Renderer.h" // Include the Renderer header file
+#include <memory>
 
 
 class Background;
@@ -33,12 +34,18 @@ public:
 
 private:
     SDL_Window* gWindow;
-    Renderer* gRenderer;
-    Background* background;
-    Frame* frame;
-    Button* button;
-    std::vector<Reel*> mReels;
-    FPSMeter* fpsMeter; 
+	std::shared_ptr<Renderer> gRenderer;
+	std::unique_ptr<Background> background;
+	std::unique_ptr<Frame> frame;
+    std::unique_ptr<Button> button;
+    std::vector<std::unique_ptr<Reel>> mReels;
+	std::unique_ptr<FPSMeter> fpsMeter;
+    //Renderer* gRenderer;
+    //Background* background;
+    //Frame* frame;
+    //Button* button;
+    //std::vector<Reel*> mReels;
+    //FPSMeter* fpsMeter; 
 
     // Time management
     Uint32 lastTime;

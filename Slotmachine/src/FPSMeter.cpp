@@ -9,7 +9,7 @@
  * @param renderer The custom Renderer to use for rendering.
  * @param font The TTF_Font to use for rendering text.
  */
-FPSMeter::FPSMeter(Renderer* renderer, TTF_Font* font)
+FPSMeter::FPSMeter(std::shared_ptr<Renderer> renderer, TTF_Font* font)
     : mRenderer(renderer), gFont(font), frameCount(0), startTime(0), fpsTexture(renderer->getSDLRenderer()) {
 }
 

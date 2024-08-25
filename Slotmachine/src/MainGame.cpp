@@ -9,8 +9,7 @@
  * Initializes member variables and seeds the random number generator.
  */
 MainGame::MainGame()
-    : gWindow(nullptr), gRenderer(nullptr), background(nullptr), frame(nullptr), button(nullptr), fpsMeter(nullptr),
-    backgroundMusic(nullptr), lastTime(0), currentTime(0), deltaTime(0), areReelsSpinning(false) {
+    : gWindow(nullptr), backgroundMusic(nullptr), lastTime(0), currentTime(0), deltaTime(0), areReelsSpinning(false) {
     std::srand(static_cast<unsigned>(std::time(0))); // Initialize random seed
 }
 
@@ -40,7 +39,7 @@ bool MainGame::init() {
             success = false;
         }
         else {
-            gRenderer = new Renderer(SCREEN_WIDTH, SCREEN_HEIGHT);  // Create Renderer instance
+            gRenderer = std::make_shared<Renderer>(SCREEN_WIDTH, SCREEN_HEIGHT);  // Create Renderer instance
             if (!gRenderer->init("Slot Machine")) {
                 printf("Renderer could not be initialized!\n");
                 success = false;
@@ -73,13 +72,13 @@ bool MainGame::init() {
  * @return True if all media assets are loaded successfully, false otherwise.
  */
 bool MainGame::loadMedia() {
-    background = new Background(gRenderer);
+    background = std::make_unique<Background>(gRenderer);
     if (!background->loadMedia("assets/textures/background.jpeg")) {
         printf("Failed to load media!\n");
         return false;
     }
 
-    frame = new Frame(gRenderer);
+    frame = std::make_unique<Frame>(gRenderer);
     frame->setDimensions(500, 300); // Adjust dimensions if needed
 
     // Load texture for the bottom section
@@ -99,12 +98,12 @@ bool MainGame::loadMedia() {
         return false;
     }
     else {
-        fpsMeter = new FPSMeter(gRenderer, font);
+        fpsMeter = std::make_unique<FPSMeter>(gRenderer, font);
         fpsMeter->start();
     }
 
     // Create and load button using the custom Renderer class
-    button = new Button(gRenderer, SCREEN_WIDTH / 2 + 115, SCREEN_HEIGHT - 128, 100, 50, "START");
+    button = std::make_unique<Button>(gRenderer, SCREEN_WIDTH / 2 + 115, SCREEN_HEIGHT - 128, 100, 50, "START");
 
     // Create reels and add them to the MainGame
     std::vector<std::string> iconPaths = { "assets/icons/watermelon.png", "assets/icons/apple.png", "assets/icons/cherries.png" };
@@ -115,8 +114,8 @@ bool MainGame::loadMedia() {
     int reelHeight = frameHeight;
 
     for (int i = 0; i < 5; ++i) {
-        Reel* reel = new Reel(gRenderer, frame->getX() + i * reelWidth, frame->getY(), reelWidth, reelHeight, iconPaths);
-        mReels.push_back(reel);
+        auto reel = std::make_unique<Reel>(gRenderer, frame->getX() + i * reelWidth, frame->getY(), reelWidth, reelHeight, iconPaths);
+        mReels.push_back(std::move(reel));
     }
 
     // Load and play background music
@@ -154,7 +153,7 @@ void MainGame::handleEvents(bool& quit) {
         if (button->isClicked() && !areReelsSpinning) {
             Uint32 startTime = SDL_GetTicks();
             Uint32 stopDelay = 0;
-            for (auto reel : mReels) {
+            for (auto& reel : mReels) {
                 reel->startSpin(0, stopDelay);
                 stopDelay += 500;
             }
@@ -173,7 +172,7 @@ void MainGame::render() {
 
     background->render();
     frame->render();
-    for (auto reel : mReels) {
+    for (auto& reel : mReels) {
         reel->render(deltaTime);
     }
     button->render();
@@ -224,24 +223,12 @@ void MainGame::run() {
  * Cleans up resources and quits SDL subsystems.
  */
 void MainGame::close() {
-    for (auto reel : mReels) {
-        delete reel;
-    }
-    mReels.clear(); // Clear the vector after deleting
+    // Smart pointers handle memory deallocation automatically
+    // No need to explicitly delete objects
 
     if (backgroundMusic != nullptr) {
         Mix_FreeMusic(backgroundMusic);
         backgroundMusic = nullptr;
-    }
-
-    delete button;
-    delete frame;
-    delete background;
-    delete fpsMeter;
-
-    if (gRenderer != nullptr) {
-        delete gRenderer;
-        gRenderer = nullptr;
     }
 
     SDL_DestroyWindow(gWindow);

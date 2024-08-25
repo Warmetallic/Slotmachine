@@ -9,7 +9,7 @@
  * @param renderer The custom Renderer to use for rendering.
  * @param borderWidth The width of the border.
  */
-Frame::Frame(Renderer* renderer, int borderWidth)
+Frame::Frame(std::shared_ptr<Renderer> renderer, int borderWidth)
     : mRenderer(renderer), mBorderWidth(borderWidth), mBottomHeight(198), mBottomTexture(nullptr), mHeaderTexture(nullptr) {
     mRect.x = 0;
     mRect.y = 0;

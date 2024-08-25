@@ -2,6 +2,7 @@
 #include <SDL_ttf.h>
 #include <stdio.h>
 #include <iostream>
+#include <memory>
 
 /**
  * Constructor for the Button class.
@@ -13,7 +14,7 @@
  * @param h The height of the button.
  * @param text The text to display on the button.
  */
-Button::Button(Renderer* renderer, int x, int y, int w, int h, const std::string& text)
+Button::Button(std::shared_ptr<Renderer> renderer, int x, int y, int w, int h, const std::string& text)
     : mRenderer(renderer), mButtonRect{ x, y, w, h }, mText(text), mHighlighted(false),
     mAnimationStartTime(SDL_GetTicks()), mClicked(false), mActive(true), mClickSound(nullptr)
 {
