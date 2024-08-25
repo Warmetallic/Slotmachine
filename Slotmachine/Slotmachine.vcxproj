@@ -164,6 +164,7 @@
     </ClCompile>
     <ClCompile Include="src\MainGame.cpp" />
     <ClCompile Include="src\Reel.cpp" />
+    <ClCompile Include="src\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="libs\libavif-16.dll" />
@@ -185,6 +186,7 @@
     <ClInclude Include="include\LTimer.h" />
     <ClInclude Include="include\MainGame.h" />
     <ClInclude Include="include\Reel.h" />
+    <ClInclude Include="include\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\sounds\click.mp3" />

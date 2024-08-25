@@ -10,6 +10,7 @@
 #include <vector>
 #include "FPSMeter.h"
 #include <SDL_mixer.h> 
+#include "Renderer.h" // Include the Renderer header file
 
 
 class Background;
@@ -32,7 +33,7 @@ public:
 
 private:
     SDL_Window* gWindow;
-    SDL_Renderer* gRenderer;
+    Renderer* gRenderer;
     Background* background;
     Frame* frame;
     Button* button;

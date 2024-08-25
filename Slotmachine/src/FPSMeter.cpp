@@ -6,11 +6,11 @@
 /**
  * Constructor for the FPSMeter class.
  * Initializes the FPS meter with the given renderer and font.
- * @param renderer The SDL_Renderer to use for rendering.
+ * @param renderer The custom Renderer to use for rendering.
  * @param font The TTF_Font to use for rendering text.
  */
-FPSMeter::FPSMeter(SDL_Renderer* renderer, TTF_Font* font)
-    : gRenderer(renderer), gFont(font), frameCount(0), startTime(0), fpsTexture(renderer) {
+FPSMeter::FPSMeter(Renderer* renderer, TTF_Font* font)
+    : mRenderer(renderer), gFont(font), frameCount(0), startTime(0), fpsTexture(renderer->getSDLRenderer()) {
 }
 
 /**
@@ -18,10 +18,8 @@ FPSMeter::FPSMeter(SDL_Renderer* renderer, TTF_Font* font)
  * Cleans up the font resource.
  */
 FPSMeter::~FPSMeter() {
-    if (gFont != nullptr) {
-        TTF_CloseFont(gFont);
-        gFont = nullptr;
-    }
+    // The font should be closed by the class that owns it
+    // We don't close it here to avoid premature deallocation
 }
 
 /**
@@ -61,5 +59,5 @@ void FPSMeter::update() {
  * @param y The y-coordinate where the FPS texture should be rendered.
  */
 void FPSMeter::render(int x, int y) {
-    fpsTexture.render(x, y);
+    fpsTexture.render(x, y); // Ensure that fpsTexture is compatible with mRenderer
 }

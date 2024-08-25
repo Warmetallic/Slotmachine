@@ -7,7 +7,7 @@
  * Initializes the background with the given renderer.
  * @param renderer The SDL_Renderer to use for rendering.
  */
-Background::Background(SDL_Renderer* renderer)
+Background::Background(Renderer* renderer)
     : mRenderer(renderer), mTexture(NULL) {}
 
 /**
@@ -33,7 +33,7 @@ bool Background::loadMedia(const std::string& path) {
         return false;
     }
 
-    mTexture = SDL_CreateTextureFromSurface(mRenderer, loadedSurface);
+    mTexture = SDL_CreateTextureFromSurface(mRenderer->getSDLRenderer(), loadedSurface);
     SDL_FreeSurface(loadedSurface);
 
     if (mTexture == NULL) {
@@ -48,5 +48,5 @@ bool Background::loadMedia(const std::string& path) {
  * Renders the background texture to the screen.
  */
 void Background::render() {
-    SDL_RenderCopy(mRenderer, mTexture, NULL, NULL);
+    mRenderer->renderTexture(mTexture, NULL, NULL);
 }

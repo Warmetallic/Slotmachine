@@ -6,10 +6,10 @@
 /**
  * Constructor for the Frame class.
  * Initializes the frame with the given renderer and border width.
- * @param renderer The SDL_Renderer to use for rendering.
+ * @param renderer The custom Renderer to use for rendering.
  * @param borderWidth The width of the border.
  */
-Frame::Frame(SDL_Renderer* renderer, int borderWidth)
+Frame::Frame(Renderer* renderer, int borderWidth)
     : mRenderer(renderer), mBorderWidth(borderWidth), mBottomHeight(198), mBottomTexture(nullptr), mHeaderTexture(nullptr) {
     mRect.x = 0;
     mRect.y = 0;
@@ -67,7 +67,7 @@ bool Frame::loadBottomTexture(const std::string& path) {
     }
 
     // Create texture from surface pixels
-    mBottomTexture = SDL_CreateTextureFromSurface(mRenderer, loadedSurface);
+    mBottomTexture = SDL_CreateTextureFromSurface(mRenderer->getSDLRenderer(), loadedSurface);
     if (mBottomTexture == nullptr) {
         std::cerr << "Unable to create texture from " << path << "! SDL Error: " << SDL_GetError() << std::endl;
     }
@@ -98,7 +98,7 @@ bool Frame::loadHeaderTexture(const std::string& path) {
     }
 
     // Create texture from surface pixels
-    mHeaderTexture = SDL_CreateTextureFromSurface(mRenderer, loadedSurface);
+    mHeaderTexture = SDL_CreateTextureFromSurface(mRenderer->getSDLRenderer(), loadedSurface);
     if (mHeaderTexture == nullptr) {
         std::cerr << "Unable to create texture from " << path << "! SDL Error: " << SDL_GetError() << std::endl;
     }
@@ -124,7 +124,7 @@ void Frame::render() {
  */
 void Frame::drawBorder() {
     // Set the color for the metallic gray border
-    SDL_SetRenderDrawColor(mRenderer, 75, 75, 68, 255); // Metallic gray color
+    mRenderer->setDrawColor(75, 75, 68, 255); // Metallic gray color
 
     // Adjust the width of the border rectangle so that it extends more on the left and right sides
     int borderThickness = 20; // Thickness of the border
@@ -139,11 +139,11 @@ void Frame::drawBorder() {
     };
 
     // Draw the border rectangle
-    SDL_RenderFillRect(mRenderer, &borderRect);
+    mRenderer->fillRect(borderRect);
 
     // Draw the black rectangle (background of the frame)
-    SDL_SetRenderDrawColor(mRenderer, 10, 10, 10, 255);
-    SDL_RenderFillRect(mRenderer, &mRect);
+    mRenderer->setDrawColor(10, 10, 10, 255);
+    mRenderer->fillRect(mRect);
 }
 
 /**
@@ -162,16 +162,16 @@ void Frame::drawHeader() {
 
     if (mHeaderTexture != nullptr) {
         // Draw the texture in the header section
-        SDL_RenderCopy(mRenderer, mHeaderTexture, nullptr, &headerRect);
+        mRenderer->renderTexture(mHeaderTexture, nullptr, &headerRect);
     }
     else {
         // If no texture, draw a black rectangle as the background
-        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
-        SDL_RenderFillRect(mRenderer, &headerRect);
+        mRenderer->setDrawColor(0, 0, 0, 255);
+        mRenderer->fillRect(headerRect);
 
         // Draw the golden border around the header section
-        SDL_SetRenderDrawColor(mRenderer, 0xFF, 0xD7, 0x00, 0xFF); // Golden color
-        SDL_RenderDrawRect(mRenderer, &headerRect);
+        mRenderer->setDrawColor(0xFF, 0xD7, 0x00, 0xFF); // Golden color
+        mRenderer->fillRect(headerRect);
     }
 }
 
@@ -191,16 +191,16 @@ void Frame::drawBottom() {
 
     if (mBottomTexture != nullptr) {
         // Draw the texture in the bottom section
-        SDL_RenderCopy(mRenderer, mBottomTexture, nullptr, &bottomRect);
+        mRenderer->renderTexture(mBottomTexture, nullptr, &bottomRect);
     }
     else {
         // If no texture, draw a black rectangle as the background
-        SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255);
-        SDL_RenderFillRect(mRenderer, &bottomRect);
+        mRenderer->setDrawColor(0, 0, 0, 255);
+        mRenderer->fillRect(bottomRect);
 
         // Draw the golden border around the bottom section
-        SDL_SetRenderDrawColor(mRenderer, 0xFF, 0xD7, 0x00, 0xFF); // Golden color
-        SDL_RenderDrawRect(mRenderer, &bottomRect);
+        mRenderer->setDrawColor(0xFF, 0xD7, 0x00, 0xFF); // Golden color
+        mRenderer->fillRect(bottomRect);
     }
 }
 
@@ -212,10 +212,10 @@ void Frame::drawLines() {
     int numParts = 5;
     int partWidth = mRect.w / numParts;
 
-    SDL_SetRenderDrawColor(mRenderer, 0xFF, 0xD7, 0x00, 0xFF); // Golden color
+    mRenderer->setDrawColor(0xFF, 0xD7, 0x00, 0xFF); // Golden color
     for (int i = 1; i < numParts; ++i) {
         int x = mRect.x + i * partWidth;
-        SDL_RenderDrawLine(mRenderer, x, mRect.y + borderOffset, x, mRect.y + mRect.h - borderOffset);
+        mRenderer->drawLine(x, mRect.y + borderOffset, x, mRect.y + mRect.h - borderOffset);
     }
 }
 

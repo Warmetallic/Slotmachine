@@ -1,16 +1,16 @@
 ﻿#include "MainGame.h"
 #include <SDL_image.h>
 #include <SDL_ttf.h>
-#include <SDL_mixer.h> 
-#include <ctime> 
+#include <SDL_mixer.h>
+#include <ctime>
 
 /**
  * MainGame class constructor.
  * Initializes member variables and seeds the random number generator.
  */
 MainGame::MainGame()
-    : gWindow(NULL), gRenderer(NULL), background(NULL), frame(NULL), button(NULL), fpsMeter(NULL),
-    backgroundMusic(NULL), lastTime(0), currentTime(0), deltaTime(0), areReelsSpinning(false) {
+    : gWindow(nullptr), gRenderer(nullptr), background(nullptr), frame(nullptr), button(nullptr), fpsMeter(nullptr),
+    backgroundMusic(nullptr), lastTime(0), currentTime(0), deltaTime(0), areReelsSpinning(false) {
     std::srand(static_cast<unsigned>(std::time(0))); // Initialize random seed
 }
 
@@ -29,34 +29,36 @@ MainGame::~MainGame() {
 bool MainGame::init() {
     bool success = true;
 
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) { // Initialize both video and audio
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         success = false;
     }
     else {
         gWindow = SDL_CreateWindow("Slot Machine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        if (gWindow == NULL) {
+        if (gWindow == nullptr) {
             printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
             success = false;
         }
         else {
-            gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
-            if (gRenderer == NULL) {
-                printf("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
+            gRenderer = new Renderer(SCREEN_WIDTH, SCREEN_HEIGHT);  // Create Renderer instance
+            if (!gRenderer->init("Slot Machine")) {
+                printf("Renderer could not be initialized!\n");
                 success = false;
             }
             else {
-                SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+                // Initialize SDL_ttf
                 if (TTF_Init() == -1) {
                     printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
                     success = false;
                 }
-                else if (Mix_Init(MIX_INIT_MP3) == 0) { // Initialize SDL_mixer
+
+                // Initialize SDL_mixer
+                if (Mix_Init(MIX_INIT_MP3) == 0) {
                     printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
                     success = false;
                 }
-                else if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-                    printf("SDL_mixer could not initialize audio! SDL_mixer Error: %s\n", Mix_GetError());
+                if (Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096) != 0) {
+                    printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
                     success = false;
                 }
             }
@@ -92,7 +94,7 @@ bool MainGame::loadMedia() {
 
     // Load font for FPSMeter
     TTF_Font* font = TTF_OpenFont("assets/fonts/arial.ttf", 28);
-    if (font == NULL) {
+    if (font == nullptr) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         return false;
     }
@@ -101,7 +103,7 @@ bool MainGame::loadMedia() {
         fpsMeter->start();
     }
 
-    // Create and load button
+    // Create and load button using the custom Renderer class
     button = new Button(gRenderer, SCREEN_WIDTH / 2 + 115, SCREEN_HEIGHT - 128, 100, 50, "START");
 
     // Create reels and add them to the MainGame
@@ -119,7 +121,7 @@ bool MainGame::loadMedia() {
 
     // Load and play background music
     backgroundMusic = Mix_LoadMUS("assets/sounds/jazz.mp3"); // Replace with your music file path
-    if (backgroundMusic == NULL) {
+    if (backgroundMusic == nullptr) {
         printf("Failed to load background music! SDL_mixer Error: %s\n", Mix_GetError());
         return false;
     }
@@ -167,7 +169,7 @@ void MainGame::handleEvents(bool& quit) {
  * Renders the game objects to the screen.
  */
 void MainGame::render() {
-    SDL_RenderClear(gRenderer);
+    gRenderer->clearScreen(255, 255, 255, 255);  // Clear screen using the Renderer class
 
     background->render();
     frame->render();
@@ -180,7 +182,7 @@ void MainGame::render() {
         fpsMeter->render(10, SCREEN_HEIGHT - 30);
     }
 
-    SDL_RenderPresent(gRenderer);
+    gRenderer->present();  // Present the screen using the Renderer class
 }
 
 /**
@@ -227,9 +229,9 @@ void MainGame::close() {
     }
     mReels.clear(); // Clear the vector after deleting
 
-    if (backgroundMusic != NULL) {
+    if (backgroundMusic != nullptr) {
         Mix_FreeMusic(backgroundMusic);
-        backgroundMusic = NULL;
+        backgroundMusic = nullptr;
     }
 
     delete button;
@@ -237,7 +239,11 @@ void MainGame::close() {
     delete background;
     delete fpsMeter;
 
-    SDL_DestroyRenderer(gRenderer);
+    if (gRenderer != nullptr) {
+        delete gRenderer;
+        gRenderer = nullptr;
+    }
+
     SDL_DestroyWindow(gWindow);
     Mix_Quit(); // Quit SDL_mixer
     TTF_Quit();

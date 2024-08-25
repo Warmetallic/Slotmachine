@@ -6,16 +6,16 @@
 /**
  * Constructor for the Button class.
  * Initializes the button with the given renderer, position, size, and text.
- * @param renderer The SDL_Renderer to use for rendering.
+ * @param renderer The Renderer to use for rendering.
  * @param x The x-coordinate of the button.
  * @param y The y-coordinate of the button.
  * @param w The width of the button.
  * @param h The height of the button.
  * @param text The text to display on the button.
  */
-Button::Button(SDL_Renderer* renderer, int x, int y, int w, int h, const std::string& text)
+Button::Button(Renderer* renderer, int x, int y, int w, int h, const std::string& text)
     : mRenderer(renderer), mButtonRect{ x, y, w, h }, mText(text), mHighlighted(false),
-    mAnimationStartTime(SDL_GetTicks()), mClicked(false), mActive(true), mClickSound(NULL)
+    mAnimationStartTime(SDL_GetTicks()), mClicked(false), mActive(true), mClickSound(nullptr)
 {
     // Initialize colors
     mBaseColor = { 255, 0, 0, 255 }; // Red
@@ -25,7 +25,7 @@ Button::Button(SDL_Renderer* renderer, int x, int y, int w, int h, const std::st
 
     // Load click sound
     mClickSound = Mix_LoadWAV("assets/sounds/click2.mp3"); // Replace with your click sound file path
-    if (mClickSound == NULL) {
+    if (!mClickSound) {
         printf("Failed to load click sound effect! SDL_mixer Error: %s\n", Mix_GetError());
     }
 }
@@ -36,9 +36,9 @@ Button::Button(SDL_Renderer* renderer, int x, int y, int w, int h, const std::st
  */
 Button::~Button() {
     // Free sound effect
-    if (mClickSound != NULL) {
+    if (mClickSound) {
         Mix_FreeChunk(mClickSound);
-        mClickSound = NULL;
+        mClickSound = nullptr;
     }
 }
 
@@ -56,8 +56,8 @@ void Button::render() {
     }
 
     // Set the color and fill the button rectangle
-    SDL_SetRenderDrawColor(mRenderer, mCurrentColor.r, mCurrentColor.g, mCurrentColor.b, mCurrentColor.a);
-    SDL_RenderFillRect(mRenderer, &mButtonRect);
+    mRenderer->setDrawColor(mCurrentColor.r, mCurrentColor.g, mCurrentColor.b, mCurrentColor.a);
+    mRenderer->fillRect(mButtonRect);
 
     // Render button text
     renderText(mText, mButtonRect.x + 10, mButtonRect.y + 10);
@@ -80,25 +80,15 @@ void Button::setColor(const SDL_Color& color) {
 void Button::renderText(const std::string& text, int x, int y) {
     // Load font
     TTF_Font* font = TTF_OpenFont("assets/fonts/FalloutFont.ttf", 26); // Replace with your font and size
-    if (font == NULL) {
+    if (!font) {
         printf("Failed to load font! SDL_ttf Error: %s\n", TTF_GetError());
         return;
     }
 
-    // Render text surface
+    // Render text using the Renderer class
     SDL_Color textColor = { 0, 0, 0, 255 }; // Black text
-    SDL_Surface* textSurface = TTF_RenderText_Solid(font, text.c_str(), textColor);
-    if (textSurface == NULL) {
-        printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
-        TTF_CloseFont(font);
-        return;
-    }
-
-    // Create texture from surface
-    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(mRenderer, textSurface);
-    if (textTexture == NULL) {
-        printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
-        SDL_FreeSurface(textSurface);
+    SDL_Texture* textTexture = mRenderer->renderText(text, font, textColor);
+    if (!textTexture) {
         TTF_CloseFont(font);
         return;
     }
@@ -108,8 +98,8 @@ void Button::renderText(const std::string& text, int x, int y) {
     int centerY = mButtonRect.y + (mButtonRect.h / 2);
 
     // Get text dimensions
-    int textWidth = textSurface->w;
-    int textHeight = textSurface->h;
+    int textWidth, textHeight;
+    SDL_QueryTexture(textTexture, nullptr, nullptr, &textWidth, &textHeight);
 
     // Adjust the x and y coordinates to center the text
     int renderX = centerX - (textWidth / 2);
@@ -117,10 +107,9 @@ void Button::renderText(const std::string& text, int x, int y) {
 
     // Set rendering space and render to screen
     SDL_Rect renderQuad = { renderX, renderY, textWidth, textHeight };
-    SDL_RenderCopy(mRenderer, textTexture, NULL, &renderQuad);
+    mRenderer->renderTexture(textTexture, nullptr, &renderQuad);
 
     // Clean up
-    SDL_FreeSurface(textSurface);
     SDL_DestroyTexture(textTexture);
     TTF_CloseFont(font);
 }
@@ -134,12 +123,7 @@ void Button::animate() {
 
     if (elapsedTime > mAnimationDuration) {
         mAnimationStartTime = currentTime;
-        if (mHighlighted) {
-            setColor(mBaseColor);
-        }
-        else {
-            setColor(mHighlightColor);
-        }
+        setColor(mHighlighted ? mBaseColor : mHighlightColor);
         mHighlighted = !mHighlighted;
     }
 }
@@ -158,8 +142,8 @@ void Button::handleEvent(const SDL_Event& e) {
             mClicked = true; // Set clicked state to true
             std::cout << "Button clicked!" << std::endl;
 
-            if (mClickSound != NULL && mActive) { // Play sound if button is active
-                playClickSound(); // Play sound if button is active
+            if (mClickSound && mActive) { // Play sound if button is active
+                playClickSound();
             }
         }
     }
@@ -195,7 +179,7 @@ void Button::setActive(bool active) {
  * Plays the click sound effect.
  */
 void Button::playClickSound() {
-    if (mClickSound != NULL) {
+    if (mClickSound) {
         if (Mix_PlayChannel(-1, mClickSound, 0) == -1) {
             printf("Failed to play sound! SDL_mixer Error: %s\n", Mix_GetError());
         }

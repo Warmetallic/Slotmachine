@@ -1,18 +1,19 @@
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
 
-#include <SDL.h>
+
 #include <string>
+#include <Renderer.h>
 
 class Background {
 public:
-    Background(SDL_Renderer* renderer);
+    Background(Renderer* renderer);
     ~Background();
     bool loadMedia(const std::string& path);
     void render();
 
 private:
-    SDL_Renderer* mRenderer;
+    Renderer* mRenderer;
     SDL_Texture* mTexture;
 };
 

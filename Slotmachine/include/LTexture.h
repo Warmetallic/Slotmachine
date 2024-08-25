@@ -18,11 +18,10 @@ public:
     int getHeight();
 
 private:
-    SDL_Renderer* mRenderer;
+    SDL_Renderer* mRenderer; // The actual SDL renderer
     SDL_Texture* mTexture;
     int mWidth;
     int mHeight;
 };
 
 #endif // LTEXTURE_H
-#pragma once

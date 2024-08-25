@@ -4,10 +4,11 @@
 #include <SDL.h>
 #include <vector>
 #include <string>
+#include "Renderer.h"
 
 class Reel {
 public:
-    Reel(SDL_Renderer* renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths);
+    Reel(Renderer* renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths);
     ~Reel();
 
     void loadIcons(const std::vector<std::string>& iconPaths);
@@ -24,11 +25,10 @@ public:
     bool shouldStop(Uint32 currentTime);
     void stopSpinAfterDelay(Uint32 delay);
 
-
 private:
     void setRandomPosition();
 
-    SDL_Renderer* mRenderer;
+    Renderer* mRenderer;
     SDL_Rect mReelRect;
     SDL_Rect mClipRect;
     std::vector<SDL_Texture*> mIcons;
@@ -42,7 +42,7 @@ private:
     int mStartPositionOffset; // Offset for staggered start
     int mStopDelay; // Delay before stopping
     Uint32 mStopTime; // Time when the reel should stop
-    float mSpinSpeed; 
+    float mSpinSpeed;
 
     // Prevent copying
     Reel(const Reel&) = delete;

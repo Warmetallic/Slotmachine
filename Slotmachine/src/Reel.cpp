@@ -8,14 +8,14 @@
 /**
  * Constructor for the Reel class.
  * Initializes the reel with the given parameters and loads the icons.
- * @param renderer The SDL_Renderer to use for rendering.
+ * @param renderer The custom Renderer to use for rendering.
  * @param x The x-coordinate of the reel.
  * @param y The y-coordinate of the reel.
  * @param w The width of the reel.
  * @param h The height of the reel.
  * @param iconPaths A vector of file paths to the icons.
  */
-Reel::Reel(SDL_Renderer* renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths)
+Reel::Reel(Renderer* renderer, int x, int y, int w, int h, const std::vector<std::string>& iconPaths)
     : mRenderer(renderer), mReelRect{ x, y, w, h }, mCurrentIconIndex(0), mSpinning(false), mSpinDuration(2000),
     mStartPosition(0), mSpinSpeed(1.0f), mMaxPosition(1000), mStartPositionOffset(0), mStopDelay(0) {
     loadIcons(iconPaths);
@@ -41,19 +41,12 @@ Reel::~Reel() {
  */
 void Reel::loadIcons(const std::vector<std::string>& iconPaths) {
     for (const auto& path : iconPaths) {
-        SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-        if (loadedSurface == NULL) {
-            printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
+        SDL_Texture* texture = mRenderer->loadTexture(path);
+        if (texture == nullptr) {
+            printf("Unable to load image %s!\n", path.c_str());
         }
         else {
-            SDL_Texture* texture = SDL_CreateTextureFromSurface(mRenderer, loadedSurface);
-            SDL_FreeSurface(loadedSurface);
-            if (texture == NULL) {
-                printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-            }
-            else {
-                mIcons.push_back(texture);
-            }
+            mIcons.push_back(texture);
         }
     }
 }
@@ -75,7 +68,9 @@ void Reel::render(Uint32 deltaTime) {
         update(deltaTime); // Update the position of the reel
     }
 
-    SDL_RenderSetClipRect(mRenderer, &mClipRect); // Set the clipping rectangle
+    mRenderer->setDrawColor(0, 0, 0, 255); // Set a draw color for the clipping rectangle if needed
+    mRenderer->fillRect(mClipRect); // Fill the rectangle with the draw color
+    SDL_RenderSetClipRect(mRenderer->getSDLRenderer(), &mClipRect); // Set the clipping rectangle
 
     size_t iconCount = mIcons.size();
     if (iconCount == 0) return; // Avoid division by zero
@@ -93,7 +88,7 @@ void Reel::render(Uint32 deltaTime) {
         }
     }
 
-    SDL_RenderSetClipRect(mRenderer, NULL); // Reset the clipping rectangle
+    SDL_RenderSetClipRect(mRenderer->getSDLRenderer(), NULL); // Reset the clipping rectangle
 }
 
 /**
@@ -133,7 +128,7 @@ void Reel::renderIcon(int index, int yOffset, int iconHeight) {
     renderQuad.y = mReelRect.y + yOffset + borderOffset;
 
     // Ensure rendering happens within frame bounds
-    SDL_RenderCopy(mRenderer, mIcons[index], NULL, &renderQuad);
+    mRenderer->renderTexture(mIcons[index], NULL, &renderQuad);
 }
 
 /**

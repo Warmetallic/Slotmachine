@@ -4,10 +4,11 @@
 #include <SDL.h>
 #include <string>
 #include <SDL_mixer.h>
+#include "Renderer.h"
 
 class Button {
 public:
-    Button(SDL_Renderer* renderer, int x, int y, int w, int h, const std::string& text);
+    Button(Renderer* renderer, int x, int y, int w, int h, const std::string& text);
     ~Button();
 
     void render();
@@ -17,7 +18,7 @@ public:
     void setActive(bool active); // method to set the button active/inactive
 
 private:
-    SDL_Renderer* mRenderer;
+    Renderer* mRenderer;  // Reference to the custom Renderer class
     SDL_Rect mButtonRect;
     std::string mText;
     bool mHighlighted;
